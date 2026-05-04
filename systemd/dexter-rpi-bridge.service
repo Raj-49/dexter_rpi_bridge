@@ -1,0 +1,27 @@
+[Unit]
+Description=Dexter RPi Hardware Bridge (ROS 2 joint_commands → PCA9685 → servos)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi
+
+# Source ROS 2 and the workspace, then launch the node
+ExecStart=/bin/bash -c '\
+  source /opt/ros/jazzy/setup.bash && \
+  source /home/pi/dexter_rpi_ws/install/setup.bash && \
+  ros2 run dexter_rpi_bridge hardware_node'
+
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# ROS 2 domain must match the laptop
+Environment="ROS_DOMAIN_ID=0"
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
