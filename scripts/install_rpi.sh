@@ -15,7 +15,7 @@
 #
 # Usage:
 #   ssh pi@dexter-rpi.local
-#   bash <(curl -fsSL https://raw.githubusercontent.com/Raj-49/dexter-rpi-bridge/main/scripts/install_rpi.sh)
+#   bash <(curl -fsSL https://raw.githubusercontent.com/Raj-49/dexter_rpi_bridge/main/scripts/install_rpi.sh)
 #
 # Or copy and run manually:
 #   chmod +x scripts/install_rpi.sh && ./scripts/install_rpi.sh
@@ -23,7 +23,7 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/Raj-49/dexter-rpi-bridge.git"
+REPO_URL="https://github.com/Raj-49/dexter_rpi_bridge.git"
 WS_DIR="/home/pi/dexter_rpi_ws"
 SRC_DIR="$WS_DIR/src"
 SERVICE_NAME="dexter-rpi-bridge"
@@ -87,11 +87,11 @@ echo "  Python libraries installed."
 echo "[5/6] Setting up ROS 2 workspace..."
 mkdir -p "$SRC_DIR"
 
-if [ -d "$SRC_DIR/dexter-rpi-bridge" ]; then
+if [ -d "$SRC_DIR/dexter_rpi_bridge" ]; then
     echo "  Repo already cloned — pulling latest..."
-    git -C "$SRC_DIR/dexter-rpi-bridge" pull
+    git -C "$SRC_DIR/dexter_rpi_bridge" pull
 else
-    git clone "$REPO_URL" "$SRC_DIR/dexter-rpi-bridge"
+    git clone "$REPO_URL" "$SRC_DIR/dexter_rpi_bridge"
 fi
 
 # Build the workspace
@@ -107,7 +107,7 @@ echo "  Workspace built at $WS_DIR"
 
 # ── Step 6: Install systemd service ──────────────────────────────────────────
 echo "[6/6] Installing systemd service..."
-sudo cp "$SRC_DIR/dexter-rpi-bridge/systemd/$SERVICE_NAME.service" \
+sudo cp "$SRC_DIR/dexter_rpi_bridge/systemd/$SERVICE_NAME.service" \
         "/etc/systemd/system/$SERVICE_NAME.service"
 sudo systemctl daemon-reload
 sudo systemctl enable "$SERVICE_NAME"
