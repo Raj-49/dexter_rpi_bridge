@@ -1,5 +1,5 @@
 [Unit]
-Description=Dexter RPi Hardware Bridge (ROS 2 joint_commands → PCA9685 → servos)
+Description=Dexter RPi Hardware Bridge (roslibpy → PCA9685 → servos)
 After=network-online.target
 Wants=network-online.target
 
@@ -7,19 +7,14 @@ Wants=network-online.target
 Type=simple
 User=pi3
 WorkingDirectory=/home/pi3
-
-# start_dexter_bridge.sh is written by install_rpi.sh
-# It activates the correct ROS 2 environment (apt or robostack)
-ExecStart=/home/pi3/start_dexter_bridge.sh
-
+EnvironmentFile=/home/pi3/dexter_bridge.env
+ExecStart=/usr/bin/python3 /home/pi3/dexter_rpi_bridge/dexter_rpi_bridge/hardware_node.py \
+          --host ${LAPTOP_IP} --port ${ROSBRIDGE_PORT}
 Restart=always
 RestartSec=5
 StandardOutput=journal
 StandardError=journal
-
-Environment="ROS_DOMAIN_ID=0"
 Environment="PYTHONUNBUFFERED=1"
-Environment="HOME=/home/pi3"
 
 [Install]
 WantedBy=multi-user.target
