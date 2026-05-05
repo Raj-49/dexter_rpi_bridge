@@ -77,9 +77,9 @@ SERVO_DEADBAND_US: int = 4       # Min PWM change before writing to hardware
 # Commands arrive at 25 Hz (40ms apart). The profile must reach each waypoint
 # before the next one arrives, while still feeling smooth.
 MAX_VELOCITY_US_PER_S: float     = 6000.0   # µs/s  (full range ~0.3s)
-MAX_ACCEL_US_PER_S2: float       = 15000.0  # µs/s² (ramp in ~0.4s)
+MAX_ACCEL_US_PER_S2: float       = 40000.0  # µs/s² — aggressive tracking for 50Hz commands
 COMMAND_TIMEOUT_S: float         = 0.5      # Freeze servos after 500ms silence
-CONTROL_HZ: int                  = 50       # Control loop rate
+CONTROL_HZ: int                  = 50       # Control loop rate (matches laptop 50Hz)
 
 # ── Accessor helpers ─────────────────────────────────────────────────────────
 def get_min_pwm(i: int) -> int:    return SERVO_CONFIG[i][0]
