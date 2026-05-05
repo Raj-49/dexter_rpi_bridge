@@ -79,7 +79,7 @@ SERVO_DEADBAND_US: int = 4       # Min PWM change before writing to hardware
 MAX_VELOCITY_US_PER_S: float     = 6000.0   # µs/s  (full range ~0.3s)
 MAX_ACCEL_US_PER_S2: float       = 15000.0  # µs/s² (ramp in ~0.4s)
 COMMAND_TIMEOUT_S: float         = 0.5      # Freeze servos after 500ms silence
-CONTROL_HZ: int                  = 100      # Control loop rate
+CONTROL_HZ: int                  = 50       # Control loop rate
 
 # ── Accessor helpers ─────────────────────────────────────────────────────────
 def get_min_pwm(i: int) -> int:    return SERVO_CONFIG[i][0]
