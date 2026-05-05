@@ -103,7 +103,7 @@ class DexterRpiBridge:
         # ── roslib client + topics ────────────────────────────────────────────
         self._client = roslibpy.Ros(host=host, port=port)
         self._client.on_ready(self._on_connected)
-        self._client.on('close', lambda: log.warning('rosbridge connection closed'))
+        self._client.on('close', self._on_close)
         self._client.on('error', lambda e: log.error(f'rosbridge error: {e}'))
 
         self._cmd_topic = roslibpy.Topic(
@@ -130,9 +130,14 @@ class DexterRpiBridge:
     def _on_connected(self):
         log.info(f'✓ Connected to rosbridge at {self._host}:{self._port}')
         self._cmd_topic.subscribe(self._command_callback)
+        time.sleep(0.1) # allow time for websocket to register sub
         log.info('  Subscribed to /rpi/joint_commands')
         log.info('  Publishing  /rpi/joint_states  @ 100Hz')
         log.info('  Publishing  /rpi/link_health   @   4Hz')
+
+    def _on_close(self):
+        log.error('rosbridge connection closed! Forcing clean restart via systemd...')
+        os._exit(1)
 
     # ── ROS Command Callback ──────────────────────────────────────────────────
 
@@ -293,14 +298,9 @@ class DexterRpiBridge:
             except Exception as e:
                 log.error(f"roslibpy run exception: {e}")
                 time.sleep(2)
-                # Client recreation is needed if reactor stopped
                 if not self._client.is_connected:
-                    log.info("Recreating client to attempt reconnect...")
-                    self._client = roslibpy.Ros(host=self._host, port=self._port)
-                    self._client.on_ready(self._on_connected)
-                    self._cmd_topic = roslibpy.Topic(self._client, '/rpi/joint_commands', 'std_msgs/msg/Float64MultiArray')
-                    self._state_topic = roslibpy.Topic(self._client, '/rpi/joint_states', 'std_msgs/msg/Float64MultiArray')
-                    self._health_topic = roslibpy.Topic(self._client, '/rpi/link_health', 'std_msgs/msg/Float64MultiArray')
+                    log.error("Client disconnected, forcing clean restart...")
+                    os._exit(1)
 
     def stop(self) -> None:
         self._running = False
