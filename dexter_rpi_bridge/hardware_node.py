@@ -106,13 +106,13 @@ class DexterRpiBridge:
 
         self._cmd_topic = roslibpy.Topic(
             self._client, '/rpi/joint_commands',
-            'std_msgs/Float64MultiArray')
+            'std_msgs/msg/Float64MultiArray')
         self._state_topic = roslibpy.Topic(
             self._client, '/rpi/joint_states',
-            'std_msgs/Float64MultiArray')
+            'std_msgs/msg/Float64MultiArray')
         self._health_topic = roslibpy.Topic(
             self._client, '/rpi/link_health',
-            'std_msgs/Float64MultiArray')
+            'std_msgs/msg/Float64MultiArray')
 
         # ── Background threads ────────────────────────────────────────────────
         self._running = True
@@ -284,7 +284,21 @@ class DexterRpiBridge:
         self._control_thread.start()
         self._state_thread.start()
         self._health_thread.start()
-        self._client.run()   # blocks until Ctrl+C
+        
+        while self._running:
+            try:
+                self._client.run(timeout=86400)   # blocks until Ctrl+C, wait up to 24h for initial connection
+            except Exception as e:
+                log.error(f"roslibpy run exception: {e}")
+                time.sleep(2)
+                # Client recreation is needed if reactor stopped
+                if not self._client.is_connected:
+                    log.info("Recreating client to attempt reconnect...")
+                    self._client = roslibpy.Ros(host=self._host, port=self._port)
+                    self._client.on_ready(self._on_connected)
+                    self._cmd_topic = roslibpy.Topic(self._client, '/rpi/joint_commands', 'std_msgs/msg/Float64MultiArray')
+                    self._state_topic = roslibpy.Topic(self._client, '/rpi/joint_states', 'std_msgs/msg/Float64MultiArray')
+                    self._health_topic = roslibpy.Topic(self._client, '/rpi/link_health', 'std_msgs/msg/Float64MultiArray')
 
     def stop(self) -> None:
         self._running = False
