@@ -5,23 +5,21 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi
+User=pi3
+WorkingDirectory=/home/pi3
 
-# Source ROS 2 and the workspace, then launch the node
-ExecStart=/bin/bash -c '\
-  source /opt/ros/jazzy/setup.bash && \
-  source /home/pi/dexter_rpi_ws/install/setup.bash && \
-  ros2 run dexter_rpi_bridge hardware_node'
+# start_dexter_bridge.sh is written by install_rpi.sh
+# It activates the correct ROS 2 environment (apt or robostack)
+ExecStart=/home/pi3/start_dexter_bridge.sh
 
 Restart=always
 RestartSec=5
 StandardOutput=journal
 StandardError=journal
 
-# ROS 2 domain must match the laptop
 Environment="ROS_DOMAIN_ID=0"
 Environment="PYTHONUNBUFFERED=1"
+Environment="HOME=/home/pi3"
 
 [Install]
 WantedBy=multi-user.target
