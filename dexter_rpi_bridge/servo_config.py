@@ -39,12 +39,12 @@ NUM_JOINTS: int = 14
 # Each entry: (min_pwm, max_pwm, min_rad, max_rad, init_pwm, pca_channel, name)
 SERVO_CONFIG: list[tuple] = [
     # ── LEFT ARM: PCA ch 0-2, RDS3235 35kg heavy servos ─────────────────────
-    (1500 - RANGE_90_HEAVY, 1500 + RANGE_90_HEAVY, -math.pi/2, math.pi/2, 1500,  0, 'jl1'),
-    (1700 - RANGE_90_HEAVY, 1700 + RANGE_90_HEAVY, -math.pi/2, math.pi/2, 1700,  1, 'jl2'),
-    (1500 - RANGE_90_HEAVY, 1500 + RANGE_90_HEAVY, -math.pi/2, math.pi/2, 1500,  2, 'jl3'),
+    (1550 - RANGE_90_HEAVY, 1550 + RANGE_90_HEAVY, -math.pi/2, math.pi/2, 1550,  0, 'jl1'),
+    (1750 - RANGE_90_HEAVY, 1750 + RANGE_90_HEAVY, -math.pi/2, math.pi/2, 1750,  1, 'jl2'),
+    (1575 - RANGE_90_HEAVY, 1575 + RANGE_90_HEAVY, -math.pi/2, math.pi/2, 1575,  2, 'jl3'),
 
     # ── LEFT WRIST + GRIPPER: PCA ch 6-9, RKI-1206 15kg light servos ────────
-    (1700 - RANGE_90_LIGHT, 1700 + RANGE_90_LIGHT, -math.pi/2, math.pi/2, 1700,  6, 'jl4'),
+    (1725 - RANGE_90_LIGHT, 1725 + RANGE_90_LIGHT, -math.pi/2, math.pi/2, 1725,  6, 'jl4'),
     (1452 - RANGE_90_LIGHT, 1452 + RANGE_90_LIGHT, -math.pi/2, math.pi/2, 1452,  7, 'jl5'),
     (1848 - RANGE_90_LIGHT, 1848 + RANGE_90_LIGHT, -math.pi/2, math.pi/2, 1848,  8, 'jl6'),
     (500,                    2400,                   0.0,        math.pi,    500,   9, 'jl7'),  # Gripper
