@@ -78,8 +78,10 @@ class DexterRpiBridge:
 
         # ── Shared state ──────────────────────────────────────────────────────
         self._lock = threading.Lock()
-        self._current_pwm = [float(get_init_pwm(i)) for i in range(NUM_JOINTS)]
-        self._engaged = [False] * NUM_JOINTS
+        # Set to -1.0 so the deadband check forces a write on the very first loop
+        self._current_pwm = [-1.0 for _ in range(NUM_JOINTS)]
+        # Engage immediately on boot to hold home position
+        self._engaged = [True] * NUM_JOINTS
 
         # ── Latest command (thread-safe single slot) ──────────────────────────
         self._cmd_lock = threading.Lock()
