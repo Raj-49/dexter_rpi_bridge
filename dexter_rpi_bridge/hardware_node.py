@@ -210,13 +210,20 @@ class DexterRpiBridge:
                     self._profiles[i].set_target(target_pwm)
 
             new_pwm = []
+            bulk_writes: dict = {}  # channel → µs, for one-shot I2C burst
+
             for i in range(NUM_JOINTS):
                 pwm = float(self._profiles[i].step(dt))
                 new_pwm.append(pwm)
                 if self._engaged[i]:
                     prev = self._current_pwm[i]
                     if abs(pwm - prev) > SERVO_DEADBAND_US:
-                        self._pca.write_microseconds(get_channel(i), int(pwm))
+                        bulk_writes[get_channel(i)] = int(pwm)
+
+            # Write all changed channels in ONE I2C burst (~1.6ms at 400kHz)
+            # vs. 14 individual writes (~6.3ms at 100kHz)
+            if bulk_writes:
+                self._pca.write_microseconds_bulk(bulk_writes)
 
             with self._lock:
                 self._current_pwm = new_pwm

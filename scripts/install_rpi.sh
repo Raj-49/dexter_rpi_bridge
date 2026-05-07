@@ -27,18 +27,28 @@ sudo apt-get update -qq
 sudo apt-get install -y -qq python3-pip i2c-tools git curl
 echo "  Done."
 
-# ── Step 2: Enable I2C ────────────────────────────────────────────────────────
-echo "[2/5] Enabling I2C..."
+# ── Step 2: Enable I2C @ 400kHz Fast Mode ────────────────────────────────────
+echo "[2/5] Enabling I2C at 400kHz Fast Mode..."
 for cfg in /boot/firmware/config.txt /boot/config.txt; do
     if [ -f "$cfg" ]; then
+        # Enable I2C
         grep -q "^dtparam=i2c_arm=on" "$cfg" || \
             echo "dtparam=i2c_arm=on" | sudo tee -a "$cfg" > /dev/null
+        # Set 400kHz Fast Mode (4x faster I2C — reduces 14-servo write from 6.3ms to 1.6ms)
+        # PCA9685 and all RPi3/4/5 fully support 400kHz
+        if grep -q "i2c_arm_baudrate" "$cfg"; then
+            # Update existing baudrate line to 400000
+            sudo sed -i 's/dtparam=i2c_arm_baudrate=[0-9]*/dtparam=i2c_arm_baudrate=400000/' "$cfg"
+        else
+            echo "dtparam=i2c_arm_baudrate=400000" | sudo tee -a "$cfg" > /dev/null
+        fi
+        echo "  I2C config written to $cfg"
         break
     fi
 done
 grep -q "^i2c-dev" /etc/modules 2>/dev/null || echo "i2c-dev" | sudo tee -a /etc/modules > /dev/null
 sudo modprobe i2c-dev 2>/dev/null || true
-echo "  I2C enabled."
+echo "  I2C enabled @ 400kHz (reboot required to activate speed change)."
 
 # ── Step 3: Python libraries ──────────────────────────────────────────────────
 echo "[3/5] Installing Python libraries (roslibpy + PCA9685)..."
